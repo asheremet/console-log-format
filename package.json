@@ -1,0 +1,23 @@
+{
+  "name": "console-log-formatter",
+  "version": "1.0.0",
+  "description": "make you console.log more visible",
+  "main": "formatter.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asheremet/console-log-format.git"
+  },
+  "keywords": ["console", "log", "formatter"],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asheremet/console-log-format/issues"
+  },
+  "homepage": "https://github.com/asheremet/console-log-format#readme",
+  "dependencies": {
+  }
+}
