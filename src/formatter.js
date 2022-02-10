@@ -32,7 +32,7 @@ const colors = {
   }
 };
 const config = {
-  pathColor: [colors.effect.dim, colors.text.cyan],
+  pathColor: [colors.effect.dim, colors.text.cyan, colors.background.black],
   exclude: /node_modules/
 }
 
@@ -43,12 +43,38 @@ function filePath() {
   return trace.split('\n')[0].replace(new RegExp(`\\s*at.+${root}(.*):.*$`), '<root>$1');
 }
 
+function isOptions(arg) {
+  if (typeof arg === 'object' && !Array.isArray(arg)){
+    return ['style', 'exclude'].some(key => !!arg[key]);
+  }
+  return false;
+}
+
+function applyOptionsTo(conf, options) {
+  Object.assign(conf, options);
+  const style = options.style;
+  if(style){
+    const [effect, text, background] = config.pathColor;
+    conf.pathColor = [
+      colors.effect[style.effect] || effect,
+      colors.text[style.text] || text,
+      colors.background[style.background] || background
+     ];
+  }
+}
+
 function printLine(fn, ...args) {
   const path = filePath();
-  if (config.exclude.test(path)) {
+  const conf = { ...config };
+  const lastArg = args[args.length - 1];
+  if (isOptions(lastArg)) {
+    const options = args.pop();
+    applyOptionsTo(conf, options);
+  }
+  if (conf.exclude && conf.exclude.test(path)) {
     fn(...args);
   } else {
-    fn(...config.pathColor, path, colors.effect.reset, ...args);
+    fn(...conf.pathColor, path, colors.effect.reset, ...args);
   }
 }
 
@@ -62,11 +88,5 @@ console.timeStamp = console.log.bind(null, new Date());
 console.timeDiff = logTimeDiff;
 
 module.exports = function formatter (options = {}) {
-  Object.assign(config, options);
-  const style = options.style;
-  if(style){
-    config.pathColor = config.pathColor
-      .concat(colors.effect[style.effect], colors.text[style.text], colors.background[style.background])
-      .filter(el => !!el)
-  }
+  applyOptionsTo(config, options);
 };
