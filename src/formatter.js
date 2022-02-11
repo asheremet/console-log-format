@@ -1,5 +1,8 @@
 'use strict';
 
+const log = console.log;
+
+const config = {};
 const colors = {
   effect: {
     reset: "\x1b[0m",
@@ -31,10 +34,27 @@ const colors = {
     white: "\x1b[47m",
   }
 };
-const config = {
-  pathColor: [colors.effect.dim, colors.text.cyan, colors.background.black],
+const defaults = {
+  style: {
+    path: {
+      text: 'cyan',
+      effect: 'dim',
+      background: 'black',
+    },
+    arguments: {
+      text: 'white',
+      effect: 'bright',
+      background: 'black',
+    }
+  },
   exclude: /node_modules/
-}
+};
+
+applyOptionsTo(config, defaults)
+// const config = {
+//   pathColor: [colors.effect.dim, colors.text.cyan, colors.background.black],
+//
+// }
 
 function filePath() {
   const fileName = __filename.replace(/\//g, '\\/');
@@ -50,17 +70,34 @@ function isOptions(arg) {
   return false;
 }
 
+function getColor(style = {}, type, location) {
+  const color = (style[location] && style[location][type]) || defaults.style[location][type]
+  return colors[type][color];
+}
+
+function getPathColors(style) {
+  return [
+    getColor(style, 'effect', 'path'),
+    getColor(style, 'text', 'path'),
+    getColor(style, 'background', 'path'),
+  ];
+}
+
+function getArgColors(style) {
+  const args = style && style.arguments;
+  return (Array.isArray(args) ? args : [args]).map(argStyle => {
+    return [
+      getColor({ arguments: argStyle }, 'effect', 'arguments'),
+      getColor({ arguments: argStyle }, 'text', 'arguments'),
+      getColor({ arguments: argStyle }, 'background', 'arguments'),
+    ]
+  })
+}
+
 function applyOptionsTo(conf, options) {
   Object.assign(conf, options);
-  const style = options.style;
-  if(style){
-    const [effect, text, background] = config.pathColor;
-    conf.pathColor = [
-      colors.effect[style.effect] || effect,
-      colors.text[style.text] || text,
-      colors.background[style.background] || background
-     ];
-  }
+  conf.pathColor = getPathColors(options.style);
+  conf.argumentsColors = getArgColors(options.style);
 }
 
 function printLine(fn, ...args) {
@@ -74,6 +111,7 @@ function printLine(fn, ...args) {
   if (conf.exclude && conf.exclude.test(path)) {
     fn(...args);
   } else {
+    args = [].concat(...args.map((arg, i) => [...(conf.argumentsColors[i] || []), arg, colors.effect.reset]));
     fn(...conf.pathColor, path, colors.effect.reset, ...args);
   }
 }
