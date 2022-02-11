@@ -111,8 +111,8 @@ function printLine(fn, ...args) {
   if (conf.exclude && conf.exclude.test(path)) {
     fn(...args);
   } else {
-    args = [].concat(...args.map((arg, i) => [...(conf.argumentsColors[i] || []), arg, colors.effect.reset]));
-    fn(...conf.pathColor, path, colors.effect.reset, ...args);
+    args = [].concat(...args.map((arg, i) => [`${(conf.argumentsColors[i] || []).join('')}${arg}${colors.effect.reset}`]));
+    fn(`${conf.pathColor.join('')}${path}${colors.effect.reset}`, ...args);
   }
 }
 
