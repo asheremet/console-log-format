@@ -1,7 +1,5 @@
 'use strict';
 
-const log = console.log;
-
 const config = {};
 const colors = {
   effect: {
@@ -39,22 +37,18 @@ const defaults = {
     path: {
       text: 'cyan',
       effect: 'dim',
-      background: 'black',
+      background: '',
     },
     arguments: {
-      text: 'white',
-      effect: 'bright',
-      background: 'black',
+      text: '',
+      effect: '',
+      background: '',
     }
   },
   exclude: /node_modules/
 };
 
 applyOptionsTo(config, defaults)
-// const config = {
-//   pathColor: [colors.effect.dim, colors.text.cyan, colors.background.black],
-//
-// }
 
 function filePath() {
   const fileName = __filename.replace(/\//g, '\\/');
@@ -70,49 +64,57 @@ function isOptions(arg) {
   return false;
 }
 
-function getColor(style = {}, type, location) {
-  const color = (style[location] && style[location][type]) || defaults.style[location][type]
+function getColor(type, location, style = {}) {
+  const color = (style[location] && style[location][type])
+    || (config.style[location] && config.style[location][type])
+    || defaults.style[location][type];
   return colors[type][color];
 }
 
 function getPathColors(style) {
   return [
-    getColor(style, 'effect', 'path'),
-    getColor(style, 'text', 'path'),
-    getColor(style, 'background', 'path'),
+    getColor('effect', 'path', style),
+    getColor('text', 'path', style),
+    getColor('background', 'path', style),
   ];
 }
 
-function getArgColors(style) {
-  const args = style && style.arguments;
-  return (Array.isArray(args) ? args : [args]).map(argStyle => {
-    return [
-      getColor({ arguments: argStyle }, 'effect', 'arguments'),
-      getColor({ arguments: argStyle }, 'text', 'arguments'),
-      getColor({ arguments: argStyle }, 'background', 'arguments'),
-    ]
-  })
+function getArgColors(argStyle) {
+  return [
+    getColor('effect', 'arguments', {arguments: argStyle}),
+    getColor('text', 'arguments', {arguments: argStyle}),
+    getColor('background', 'arguments', {arguments: argStyle}),
+  ]
+}
+
+function applyStyle(confStyle, optionStyle) {
+  const { path = config.path, arguments: args = config.arguments } = optionStyle;
+  return { path, arguments: args };
 }
 
 function applyOptionsTo(conf, options) {
-  Object.assign(conf, options);
-  conf.pathColor = getPathColors(options.style);
-  conf.argumentsColors = getArgColors(options.style);
+  conf.exclude = options.exclude || defaults.exclude;
+  conf.style = applyStyle(conf.style, options.style);
 }
 
 function printLine(fn, ...args) {
   const path = filePath();
   const conf = { ...config };
+  let options;
   const lastArg = args[args.length - 1];
   if (isOptions(lastArg)) {
-    const options = args.pop();
+    options = args.pop();
     applyOptionsTo(conf, options);
   }
   if (conf.exclude && conf.exclude.test(path)) {
     fn(...args);
   } else {
-    args = [].concat(...args.map((arg, i) => [`${(conf.argumentsColors[i] || []).join('')}${arg}${colors.effect.reset}`]));
-    fn(`${conf.pathColor.join('')}${path}${colors.effect.reset}`, ...args);
+    args = [].concat(...args.map((arg, i) => {
+      const style = Array.isArray(conf.style.arguments) && conf.style.arguments[i] ? conf.style.arguments[i] : conf.style.arguments;
+      return [`${getArgColors(style).join('')}${arg}${colors.effect.reset}`];
+    }));
+    const formattedPath = `${getPathColors((options || conf).style).join('')}${path}${colors.effect.reset}`;
+    fn(formattedPath, ...args);
   }
 }
 
