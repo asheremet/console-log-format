@@ -6,7 +6,7 @@ const colors = {
     reset: "\x1b[0m",
     bright: "\x1b[1m",
     dim: "\x1b[2m",
-    underscore: "\x1b[4m",
+    underline: "\x1b[4m",
     blink: "\x1b[5m",
     reverse: "\x1b[7m",
     hidden: "\x1b[8m",
@@ -109,10 +109,14 @@ function printLine(fn, ...args) {
   if (conf.exclude && conf.exclude.test(path)) {
     fn(...args);
   } else {
-    args = [].concat(...args.map((arg, i) => {
-      const style = Array.isArray(conf.style.arguments) && conf.style.arguments[i] ? conf.style.arguments[i] : conf.style.arguments;
-      return [`${getArgColors(style).join('')}${arg}${colors.effect.reset}`];
-    }));
+    if(typeof args !== "object") {
+      args = args.map((arg, i) => {
+        const style = Array.isArray(conf.style.arguments) && conf.style.arguments[i]
+          ? conf.style.arguments[i]
+          : conf.style.arguments;
+        return `${getArgColors(style).join('')}${arg}${colors.effect.reset}`;
+      });
+    }
     const formattedPath = `${getPathColors((options || conf).style).join('')}${path}${colors.effect.reset}`;
     fn(formattedPath, ...args);
   }
