@@ -117,8 +117,13 @@ function printLine(fn, ...args) {
         return `${getArgColors(style).join('')}${arg}${colors.effect.reset}`;
       });
     }
-    const formattedPath = `${getPathColors((options || conf).style).join('')}${path}${colors.effect.reset}`;
-    fn(formattedPath, ...args);
+    if (conf.path === false) {
+      fn(...args);
+    }
+    else {
+      const formattedPath = `${getPathColors((options || conf).style).join('')}${path}${colors.effect.reset}`;
+      fn(formattedPath, ...args);
+    }
   }
 }
 
