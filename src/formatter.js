@@ -1,5 +1,6 @@
 'use strict';
 
+const log = console.log;
 const config = {};
 const colors = {
   effect: {
@@ -45,10 +46,9 @@ const defaults = {
       background: '',
     }
   },
-  exclude: /node_modules/
+  exclude: /node_modules/,
+  verboseError: false,
 };
-
-applyOptionsTo(config, defaults)
 
 function filePath() {
   const fileName = __filename.replace(/\//g, '\\/');
@@ -93,36 +93,60 @@ function applyStyle(confStyle, optionStyle) {
 }
 
 function applyOptionsTo(conf, options) {
-  conf.exclude = options.exclude || defaults.exclude;
-  conf.style = applyStyle(conf.style, options.style);
+  conf.verboseError = options.verbose || defaults.verboseError;
+  conf.exclude = (options.exclude instanceof RegExp || options.exclude === null) ? options.exclude : defaults.exclude;
+  conf.style = options.style && applyStyle(conf.style, options.style) || {};
+}
+
+function formatArguments(args, argStyles){
+  return args.map((arg, i) => {
+    if (typeof arg === 'object') return arg;
+
+    let style;
+    if (Array.isArray(argStyles)) {
+      if (argStyles[i] === null) {
+        style = Array.isArray(config.style.arguments) ? config.style.arguments[i] : config.style.arguments;
+      } else {
+        style = argStyles[i];
+      }
+    } else {
+      style = argStyles;
+    }
+
+    return `${getArgColors(style).join('')}${arg}${colors.effect.reset}`;
+  });
 }
 
 function printLine(fn, ...args) {
-  const path = filePath();
-  const conf = { ...config };
-  let options;
-  const lastArg = args[args.length - 1];
-  if (isOptions(lastArg)) {
-    options = args.pop();
-    applyOptionsTo(conf, options);
-  }
-  if (conf.exclude && conf.exclude.test(path)) {
-    fn(...args);
-  } else {
-    if(typeof args !== "object") {
-      args = args.map((arg, i) => {
-        const style = Array.isArray(conf.style.arguments) && conf.style.arguments[i]
-          ? conf.style.arguments[i]
-          : conf.style.arguments;
-        return `${getArgColors(style).join('')}${arg}${colors.effect.reset}`;
-      });
+  const conf = {...config};
+  try {
+    const path = filePath();
+    let options;
+    const lastArg = args[args.length - 1];
+    if (isOptions(lastArg)) {
+      options = args.pop();
+      applyOptionsTo(conf, options);
     }
-    if (conf.path === false) {
+    if (conf.exclude && conf.exclude.test(path)) {
       fn(...args);
     }
     else {
-      const formattedPath = `${getPathColors((options || conf).style).join('')}${path}${colors.effect.reset}`;
-      fn(formattedPath, ...args);
+      args = formatArguments(args, conf.style.arguments);
+
+      if (conf.path === false) {
+        fn(...args);
+      }
+      else {
+        const formattedPath = `${getPathColors((options || conf).style).join('')}${path}${colors.effect.reset}`;
+        fn(formattedPath, ...args);
+      }
+    }
+  } catch (err) {
+    if (conf.verboseError) {
+      log(`${colors.text.yellow}!!!!!!!!!!!Error in the Formatter:!!!!!!!!!!!\n`, err);
+      log(`=============================================${colors.effect.reset}`);
+    } else {
+      log(`${colors.text.yellow}Error in Console-Log-Formatter:`, err.message, colors.effect.reset);
     }
   }
 }
@@ -130,6 +154,8 @@ function printLine(fn, ...args) {
 function logTimeDiff(d, ...rest) {
   console.log(`${new Date() - d} ms`, ...rest);
 }
+
+applyOptionsTo(config, defaults)
 
 console.log = printLine.bind(null, console.log);
 console.trace = printLine.bind(null, console.trace);
