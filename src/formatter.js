@@ -59,7 +59,7 @@ function filePath() {
 
 function isOptions(arg) {
   if (typeof arg === 'object' && !Array.isArray(arg)){
-    return ['style', 'exclude'].some(key => !!arg[key]);
+    return arg.clf;
   }
   return false;
 }
@@ -96,6 +96,7 @@ function applyOptionsTo(conf, options) {
   conf.verboseError = options.verbose || defaults.verboseError;
   conf.exclude = (options.exclude instanceof RegExp || options.exclude === null) ? options.exclude : defaults.exclude;
   conf.style = options.style && applyStyle(conf.style, options.style) || {};
+  conf.disable = options.disable;
 }
 
 function formatArguments(args, argStyles){
@@ -127,7 +128,7 @@ function printLine(fn, ...args) {
       options = args.pop();
       applyOptionsTo(conf, options);
     }
-    if (conf.exclude && conf.exclude.test(path)) {
+    if (conf.disable || conf.exclude && conf.exclude.test(path)) {
       fn(...args);
     }
     else {
