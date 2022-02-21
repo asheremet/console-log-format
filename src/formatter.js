@@ -97,6 +97,7 @@ function applyOptionsTo(conf, options) {
   conf.exclude = (options.exclude instanceof RegExp || options.exclude === null) ? options.exclude : defaults.exclude;
   conf.style = options.style && applyStyle(conf.style, options.style) || {};
   conf.disable = options.disable;
+  conf.path = options.path;
 }
 
 function formatArguments(args, argStyles){
