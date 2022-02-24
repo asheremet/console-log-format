@@ -1,5 +1,5 @@
 # Console.log Formatter
-Make your `console.log` more visible and stand out among others. See the file and the line where the `console.log` is placed to make cleaning up easier.
+Make your `console.log` more visible and stand out from others'. See the file path and the line number where the `console.log` is placed to make cleaning up easier.
 
 ## Installation
 ```
@@ -35,9 +35,9 @@ console.log("Hello", "world", {
 * `disable` (Boolean)
     * use when you need to disable formatting on certain functions
 * `exclude` (RegEx)
-    * by default anything in `node_modules` is not formatted. Pass your own RegEx to define paths to the files to be excluded from formatting. To apply formatting to everything, set to `null`.
+    * by default, anything in `node_modules` is not formatted. Pass your own RegEx to define paths to the files to be excluded from formatting. To apply formatting to everything, set to `null`.
 * `path` (Boolean)
-    * by default the path to the file with the line number of where the function is called from are logged in front of all other arguments. To exclude, set to `false`.
+    * by default, the path to the file with the line number of where the function is called from is logged in front of all other arguments. To exclude, set to `false`.
 * `style` (Object)
     * the styling object to describe the colors of the text and background of file paths and function arguments
     * the following colors are available to choose from: \

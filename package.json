@@ -1,7 +1,7 @@
 {
   "name": "console-log-formatter",
   "version": "1.0.0",
-  "description": "make you console.log more visible",
+  "description": "simple lightweight console.log formatter that makes your logs stand out from others', and easier to find and cleanup",
   "main": "src/formatter.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,7 +16,7 @@
     "formatter"
   ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/asheremet/console-log-formatter/issues"
   },
