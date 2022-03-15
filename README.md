@@ -1,5 +1,6 @@
 # Console.log Formatter
-Make your `console.log` more visible and stand out from others'. See the file path and the line number where the `console.log` is placed to make cleaning up easier.
+Make your `console.log` more visible and stand out from others'. See the file path and the line number where the `console.log` is placed to make cleaning up easier.\
+*Note*: only works on Mac for now
 
 ## Installation
 ```
