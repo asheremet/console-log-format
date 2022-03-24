@@ -1,6 +1,6 @@
 {
   "name": "console-log-formatter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "simple lightweight console.log formatter that makes your logs stand out from others', and easier to find and cleanup",
   "main": "src/formatter.js",
   "scripts": {
