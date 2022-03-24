@@ -52,7 +52,7 @@ const defaults = {
 
 function filePath() {
   const fileName = __filename.replace(/([/\\])/g, '\\$1');
-  const root = process.cwd().replace(/[/\\]/g, '\\$1');
+  const root = process.cwd().replace(/([/\\])/g, '\\$1');
   const trace = new Error().stack.replace(new RegExp(`[\\s\\S]+${fileName}.*?\\)\\s+`, 'm'), '');
   return trace.split('\n')[0].replace(new RegExp(`\\s*at.+${root}(.*):.*$`), '<root>$1');
 }
