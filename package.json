@@ -4,6 +4,7 @@
   "description": "simple lightweight console.log formatter that makes your logs stand out from others', and easier to find and cleanup",
   "main": "src/formatter.js",
   "scripts": {
+    "build": "cp -R README.md package.json src dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
