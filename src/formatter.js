@@ -48,13 +48,14 @@ const defaults = {
   },
   exclude: /node_modules/,
   verboseError: false,
+  wrappers: 0,
 };
 
 function filePath() {
   const fileName = __filename.replace(/([/\\])/g, '\\$1');
   const root = process.cwd().replace(/([/\\])/g, '\\$1');
   const trace = new Error().stack.replace(new RegExp(`[\\s\\S]+${fileName}.*?\\)\\s+`, 'm'), '');
-  return trace.split('\n')[0].replace(new RegExp(`\\s*at.+${root}(.*):.*$`), '<root>$1');
+  return trace.split('\n')[config.wrappers].replace(new RegExp(`\\s*at.+${root}(.*):.*$`), '<root>$1');
 }
 
 function isOptions(arg) {
@@ -98,6 +99,7 @@ function applyOptionsTo(conf, options) {
   conf.style = options.style && applyStyle(conf.style, options.style) || {};
   conf.disable = options.disable;
   conf.path = options.path;
+  conf.wrappers = options.wrappers || 0;
 }
 
 function formatArguments(args, argStyles){

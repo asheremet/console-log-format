@@ -54,6 +54,8 @@ Also available the following effects:\
         * `text`
         * `background`
         * `effect`
+* `wrappers` (Number)
+    * if you notice that the wrong file name is given, you might be using other console.log wrapper package(s). Try setting this property to the number of packages you are using. Probably no more than `1`. Defaults to `0`. You wouldn't need this option if everything looks correct.
 
 ## Functions
 
