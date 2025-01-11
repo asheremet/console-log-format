@@ -59,7 +59,7 @@ function filePath() {
 }
 
 function isOptions(arg) {
-  if (typeof arg === 'object' && !Array.isArray(arg)){
+  if (arg && typeof arg === 'object' && !Array.isArray(arg)){
     return arg.clf;
   }
   return false;
